@@ -1,10 +1,12 @@
 ## Usage
 
-Add *bash docker_runner.sh* before your python command. The script will pass everything followed into the docker. For **Pacman**, you can run a simple game with the following commands.
+Add *bash docker_runner.sh* before your python command. The script will pass everything followed into the docker. For **Pacman**, you can run a simple game with the following commands. Please run this in your repo's root directory.
+```
+bash docker/docker_runner.sh
+```
+And then you can run the game following the instruction. Please use option `-t` to make sure only use `textDisplayer`. You might need to use `-p` options if you want to see the print in terminal, or use `-l` option to save the output into a log file.
 
-     bash docker_runner.sh python capture.py <options>
-
-The container will remove itself automatically.
+You might need to use superuser (adminstrator) access to run this.
 
 ## Config
 
