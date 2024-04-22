@@ -29,7 +29,7 @@ There are many files in this package, most of them implementing the game itself.
 
 ### Other supporting files (do not modify):
 
-* `splendor_runner.py`: Support code to setup and run games. See the loadParameter() function for details on acceptable arguments.
+* `general_game_runner.py`: Support code to setup and run games. See the loadParameter() function for details on acceptable arguments.
 * `splendor_utils.py`: Holds the full lists of cards and nobles used in the game, along with their gemstone costs and point values.
 
 Of course, you are welcome to read and use any and all code supplied. For instance, if your agent is trying to simulate future gamestates, it might want to appropriate code from `splendor_model.py` in order to do so.
