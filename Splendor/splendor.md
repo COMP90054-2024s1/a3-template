@@ -1,4 +1,4 @@
-# SPLENDOR : A Competitive Game Environment for COMP90054, Semester 2, 2021
+# SPLENDOR : A Competitive Game Environment for COMP90054, Semester 2, 2024
 ---------------------------------------------------------------------------
 
 ### Table of contents
@@ -29,7 +29,7 @@ There are many files in this package, most of them implementing the game itself.
 
 ### Other supporting files (do not modify):
 
-* `general_game_runner.py`: Support code to setup and run games. See the loadParameter() function for details on acceptable arguments.
+* `splendor_runner.py`: Support code to setup and run games. See the loadParameter() function for details on acceptable arguments.
 * `splendor_utils.py`: Holds the full lists of cards and nobles used in the game, along with their gemstone costs and point values.
 
 Of course, you are welcome to read and use any and all code supplied. For instance, if your agent is trying to simulate future gamestates, it might want to appropriate code from `splendor_model.py` in order to do so.
@@ -52,9 +52,7 @@ Please read the official rules here: https://cdn.1j1ju.com/medias/7f/91/ba-splen
 ### Changes
 
 We have made a few **alterations** to these rules for computational reasons:
-* A golden token is considered as a special gem with the colour of yellow.
-
-* Reserve action can only reserve cards from the table for simplicity.
+* A golden token is considerred as a special gem with the colour of yellow.
 
 * Cards are replaced at the end of each turn, not immediately. This functionally doesn't change anything aside from a rare edge case: if an agent, possessing 10 gems, reserves a card along with a wild (yellow gem), they need to return 1 gem of their choice by the end of their turn. Their choice may benefit from knowledge of the newly revealed card. I didn't deem this a substantial enough mechanic to warrant inclusion at the cost of added complexity and computation time.
 
@@ -103,28 +101,20 @@ There will be an initial start-up allowance of 15 seconds. Your agent will need 
 By default, you can run a game against two random agents with the following:
 
 ```bash
-$ python general_game_runner.py -g Splendor
+$ python splendor_runner.py
 ```
 
 To enter interactive mode, use the argument --interactive. In the game, the Citrine agent will be titled "Human", and you will be able to select actions each turn. This works with both GUI and text displayer.
 ```bash
-$ python general_game_runner.py -g Splendor --interactive
+$ python3 splendor_runner.py --interactive
 ```
 
-To specify the running agent, the option `-a` or `--agents` is needed, follows two agent python files separated by ','. For example:
+To change Red or Citrine agents, use -r and -c respectively, along with the agent path:
 ```bash
-$ python general_game_runner.py -g Splendor-a agents.generic.random,agents.generic.random
+$ python3 splendor_runner.py -r agents.MyTeam -c agents.anotherTeam
 ```
 
 If the game renders at a resolution that doesn't fit your screen, try using the argument --half-scale. The game runs in windowed mode by default, but can be toggled to fullscreen with F11.
-
-### Options:
-The options are listed (including but not limited to) as follows:
-* `-t`: text displayer, use when you do not want GUI
-* `-s`: save the replay
-* `-l`: save the log
-* `-p`: enable printing
-* `--interactive`: enable interactive model. (You can choose your action from the left bottom black list frame)
 
 ### Restrictions: 
 
