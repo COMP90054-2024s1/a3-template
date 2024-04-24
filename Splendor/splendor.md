@@ -71,8 +71,8 @@ To be specific about this:
       * collect 1 gems.
    * If you have 10, your are allow to:
       * collect 3 gems and return 3 gems with different colour than those collected.
-      * collect 3 gems and return 2 gems with different colour than those collected.
-      * collect 3 gems and return 1 gems with different colour than those collected. 
+      * collect 2 gems and return 2 gems with different colour than those collected.
+      * collect 1 gems and return 1 gems with different colour than those collected. 
    * The returned gems:
       * must not contain any gem that has the same colour as those collected in the same action.
       * can contain same colour gems.
