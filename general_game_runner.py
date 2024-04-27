@@ -105,7 +105,7 @@ def run(options,msg):
     num_of_agents = options.num_of_agents
 
     # fill in the defaults
-    agent_names = options.agent_names.split(",")
+    agent_names = options.agent_display_names.split(",")
     agents = options.agents.split(",")
 
 
@@ -327,7 +327,7 @@ def loadParameter():
     parser = OptionParser(usageStr)
 
     parser.add_option('-a','--agents', help='A list of the agents, etc, agents.myteam.player', default="agents.generic.random,agents.generic.random") 
-    parser.add_option('--agent_names', help='A list of agent names', default="random0,random1") 
+    parser.add_option('--agent_display_names', help='A list of agent names', default="random0,random1") 
 
     parser.add_option('-n', '--num_of_agents', type='int',help='The number of agents in this game', default=2)
 
