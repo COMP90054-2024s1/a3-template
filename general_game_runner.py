@@ -19,9 +19,7 @@ import datetime
 import time
 import pickle
 import random
-import git
-import shutil
-import logging
+
 import pytz
 import json
 from template import Agent as DummyAgent
@@ -44,95 +42,7 @@ DATE_FORMAT = '%d/%m/%Y %H:%M:%S'  # RMIT Uni (Australia)
 # CLASS DEF ----------------------------------------------------------------------------------------------------------#
 
 
-def is_git_repo(path):
-    try:
-        _ = git.Repo(path).git_dir
-        return True
-    except git.InvalidGitRepositoryError:
-        return False
 
-# Extract the timestamp for a given tag in a repo
-def get_commit_time(repo:git.Repo):
-    """
-    Returns the commit time based on the TIMEZONE
-
-    :param repo: the repository 
-    :return: the commit time
-    """
-    commit = repo.commit()
-    commit_date = datetime.datetime.fromtimestamp(commit.committed_date, tz=TIMEZONE)
-    return commit_date.strftime(DATE_FORMAT)
-
-def gitCloneTeam(team_info, output_path):
-    
-    token = None
-    with open(GIT_TOKEN_PATH, "r") as f:
-        token = f.read()
-    
-
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)    
-    print(team_info)
-    clone_url = f"https://{token}@{team_info['url'].replace('https://','')}"
-    team_name = str(team_info['team_name'])
-    repo_path = f"{output_path}/{str(team_info['team_name'])}"
-    commit_id = team_info['commit_id']
-    branch = "main"
-
-    logging.info(f'Checking {repo_path} contains git repo or not.')
-    submission_time='N/A'
-    if not os.path.exists(repo_path):
-        os.makedirs(repo_path)
-
-    if not is_git_repo(repo_path):
-        logging.info(f'Trying to clone NEW team repo from URL {clone_url}.')
-        try:
-            repo = git.Repo.clone_from(clone_url, repo_path, branch=branch, no_checkout=True)
-            repo.git.checkout(commit_id)
-            # repo = git.Repo.clone_from(clone_url, repo_path)
-            submission_time = get_commit_time(repo)
-            logging.info(f'Team {team_name} cloned successfully with tag date {submission_time}.')
-            team_info.update({'git':'succ'})
-            team_info.update({'comments':'N/A'})
-            team_info.update({'submitted_time': submission_time})
-            repo.close()
-            # teams_new.append(team_name)
-        except git.GitCommandError as e:
-            # teams_missing.append(team_name)
-            logging.warning(f'Repo for team {team_name} with tag/branch "{branch}" cannot be cloned: {e.stderr.replace(token,"")}')
-
-            team_info.update({'git':'failed'})
-            team_info.update({'comments':f'Repo for team {team_name} with tag/branch {branch} cannot be cloned: {e.stderr.replace(token,"")}'})
-            # repo.close()
-        except KeyboardInterrupt:
-            logging.warning('Script terminated via Keyboard Interrupt; finishing...')
-            sys.exit("keyboard interrupted!")
-            # repo.close()
-        except TypeError as e:
-            logging.warning(f'Repo for team {team_name} was cloned but has no tag {branch}, removing it...: {e}')
-            shutil.rmtree(repo_path)
-            # teams_notag.append(team_name)
-            team_info.update({'git':'failed'})
-            team_info.update({'comments':f'Repo for team {team_name} was cloned but has no tag {branch}, removing it...: {e}'})
-            # repo.close()
-        except Exception as e:
-            logging.error(
-                f'Repo for team {team_name} cloned but unknown error when getting tag {branch}; should not happen. Stopping... {e}')
-            team_info.update({'git':'failed'})
-            team_info.update({'comments':f'Repo for team {team_name} cloned but unknown error when getting tag {branch}; should not happen. Stopping... {e}'})
-            # repo.close()  
-    else:
-        team_info.update({'git':'succ'})
-
-    if team_info['git'] == 'succ':
-        try:
-            if not os.path.exists(f"agents/{team_name}"):
-                shutil.copytree(f"{repo_path}/agents/{team_name}", f"agents/{team_name}")
-        except:
-            traceback.print_exc()
-        shutil.rmtree(f"{repo_path}")
-    team_info.update({'copy_files':os.path.exists(f"agents/{team_name}/player.py")})
-    return team_info
 
 
 def loadAgent(matches,superQuiet = True):
@@ -197,8 +107,7 @@ def run(options,msg):
     # fill in the defaults
     agent_names = options.agent_names.split(",")
     agents = options.agents.split(",")
-    agent_urls = options.agent_urls.split(",")
-    agent_commit_ids = options.agent_commit_ids.split(",")
+
 
 
     missing  = num_of_agents-len(agent_names)
@@ -219,11 +128,6 @@ def run(options,msg):
         team_info = {}
         team_info['team_name'] = agent_names[i]
         team_info['agent'] = agents[i]
-        if options.cloud:
-            team_info['url'] = agent_urls[i]
-            team_info['commit_id'] = agent_commit_ids[i]
-            clone_result = gitCloneTeam(team_info, "temp")
-            team_info.update(clone_result)
         matches['teams'].update({i:team_info})
     # Load game based on name
     game_name = options.game 
@@ -421,24 +325,9 @@ def loadParameter():
                     - starts a fully automated game where Citrine team is a custom agent and the rest are random.
     """
     parser = OptionParser(usageStr)
-    # parser.add_option('-r','--red', help='Red team agent file', default=DEFAULT_AGENT)
-    # parser.add_option('-b','--blue', help='Blue team agent file', default=DEFAULT_AGENT) 
+
     parser.add_option('-a','--agents', help='A list of the agents, etc, agents.myteam.player', default="agents.generic.random,agents.generic.random") 
-
-    # parser.add_option('--redName', help='Red agent name', default='Red')
-    # parser.add_option('--blueName', help='Blue agent name', default='Blue') 
     parser.add_option('--agent_names', help='A list of agent names', default="random0,random1") 
-
-    # whether load team from cloud
-    parser.add_option('--cloud', action='store_true', help='Display output as text only (default: False)', default=False)
-
-    # parser.add_option('--redURL', help='Red team repo URL', default=None) 
-    # parser.add_option('--redCommit', help='Red team commit id', default=None) 
-    # parser.add_option('--blueURL', help='Blue team repo URL', default=None) 
-    # parser.add_option('--blueCommit', help='Blue team commit id', default=None) 
-
-    parser.add_option('--agent_urls', help='A list of urls', default="")
-    parser.add_option('--agent_commit_ids', help='A list of commit ids', default="") 
 
     parser.add_option('-n', '--num_of_agents', type='int',help='The number of agents in this game', default=2)
 
@@ -485,8 +374,18 @@ if __name__ == '__main__':
     msg = ""
     options = loadParameter()
     matches = run(options,msg)
-    # with open("output/matches.json",'w') as f:
-    #     json.dump(matches,f)  
+    if not os.path.exists("output/"):
+        os.mkdir("output")
+
+    if os.path.exists("output/team_info.json"):
+        with open("output/team_info.json","r") as f:
+            team_info = json.load(f)
+        for key in team_info['teams'].keys():
+            team_info['teams'][key]['team_name'] = matches['teams'][int(key)]['team_name']
+            # team_info['teams'][key]['load_agent'] = matches['teams'][key]['load_agent']
+            matches['teams'][int(key)].update(team_info['teams'][key])
+    with open("output/matches.json",'w') as f:
+        json.dump(matches,f)  
 
 
 # END FILE -----------------------------------------------------------------------------------------------------------#
