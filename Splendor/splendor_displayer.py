@@ -475,6 +475,9 @@ class GUIDisplayer(Displayer):
         pass    
 
 
+    def IllegalWarning(self,runner,agent_index,actions,selected):
+        pass
+
 class TextDisplayer(Displayer):
     def __init__(self):
         print ("--------------------------------------------------------------------")
@@ -522,7 +525,10 @@ class TextDisplayer(Displayer):
         print ("------------------------State After Action----------------------------------")
         self._DisplayState(game_state)
         
-        
+    def IllegalWarning(self,runner,agent_index,actions,selected):
+        print ("Agent {} Iellgal Action {} out of {}.".format(id,runner.warnings[id],runner.warning_limit))
+        print ("Action {} selected from {}.\n".format(selected,actions))
+
     def TimeOutWarning(self,runner,id):
         print ("Agent {} Time Out, {} out of {}.".format(id,runner.warnings[id],runner.warning_limit))
 

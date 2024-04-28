@@ -146,7 +146,7 @@ class Game:
                                 if selected=="timeout":
                                     self.displayer.TimeOutWarning(self,agent_index)
                                 else:
-                                    self.displayer.IllegalWarning(self,agent_index)                        
+                                    self.displayer.IllegalWarning(self,agent_index,actions,selected)                        
                             selected = random.choice(actions)
 
                 
