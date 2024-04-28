@@ -67,7 +67,7 @@ def loadAgent(matches,superQuiet = True):
             agents[i] = agent_temp
             matches['teams'][i].update({'load_agent': True})
             if not superQuiet:
-                print ('Agent {} team {} agent {} loaded'.format(i,matches['teams'][i]["team_name"],teams[i]['agent']))
+                print ('Agent {} team {} agent {} loaded'.format(i,matches['teams'][i]["team_display_name"],teams[i]['agent']))
         else:
             valid_game = False
             agents[i] = DummyAgent(i)
@@ -126,7 +126,8 @@ def run(options,msg):
     # load agents info
     for i in range(num_of_agents):
         team_info = {}
-        team_info['team_name'] = agent_names[i]
+        team_info['team_display_name'] = agent_names[i]
+        # team_info['team_name'] = agent_names[i]
         team_info['agent'] = agents[i]
         matches['teams'].update({i:team_info})
     # Load game based on name
@@ -381,7 +382,7 @@ if __name__ == '__main__':
         with open("output/team_info.json","r") as f:
             team_info = json.load(f)
         for key in team_info['teams'].keys():
-            team_info['teams'][key]['team_name'] = matches['teams'][int(key)]['team_name']
+            # team_info['teams'][key]['team_name'] = matches['teams'][int(key)]['team_name']
             # team_info['teams'][key]['load_agent'] = matches['teams'][key]['load_agent']
             matches['teams'][int(key)].update(team_info['teams'][key])
     with open("output/matches.json",'w') as f:
