@@ -62,10 +62,14 @@ def get_commit_time(repo:git.Repo):
     commit_date = datetime.datetime.fromtimestamp(commit.committed_date, tz=TIMEZONE)
     return commit_date.strftime(DATE_FORMAT)
 
-def gitCloneTeam(team_info, output_path,default_branch='main'):
+def gitCloneTeam(team_info, output_path,default_branch='main',token_path=""):
     if not os.path.exists(output_path):
-        os.makedirs(output_path)    
-    clone_url = f"git@github.com:{team_info['url'].replace('https://github.com/','')}"
+        os.makedirs(output_path)   
+    token = None
+    with open(token_path, "r") as f:
+        token = f.read()
+    # clone_url = f"git@github.com:{team_info['url'].replace('https://github.com/','')}"
+    clone_url = f"https://{token}@{team_info['url'].replace('https://','')}"
     team_name = str(team_info['team_name'])
     repo_path = f"{output_path}/{str(team_info['team_name'])}"
     commit_id = team_info['commit_id']
@@ -79,7 +83,7 @@ def gitCloneTeam(team_info, output_path,default_branch='main'):
             repo.git.checkout(commit_id)
             # repo = git.Repo.clone_from(clone_url, repo_path)
             submission_time = get_commit_time(repo)
-            team_info.update({'git':'succ'})
+            team_info.update({'git_status': True})
             team_info.update({'comments':'N/A'})
             team_info.update({'submitted_time': submission_time})
             repo.close()
@@ -88,7 +92,7 @@ def gitCloneTeam(team_info, output_path,default_branch='main'):
             # teams_missing.append(team_name)
             print(f'Repo for team {team_name} with tag/branch "{default_branch}" cannot be cloned: {e.stderr}')
 
-            team_info.update({'git':'failed'})
+            team_info.update({'git_status':False})
             team_info.update({'comments':f'Repo for team {team_name} with tag/branch {default_branch} cannot be cloned: {e.stderr}'})
             # repo.close()
         except KeyboardInterrupt:
@@ -99,19 +103,19 @@ def gitCloneTeam(team_info, output_path,default_branch='main'):
             print(f'Repo for team {team_name} was cloned but has no tag {default_branch}, removing it...: {e}')
             shutil.rmtree(repo_path)
             # teams_notag.append(team_name)
-            team_info.update({'git':'failed'})
+            team_info.update({'git_status':False})
             team_info.update({'comments':f'Repo for team {team_name} was cloned but has no tag {default_branch}, removing it...: {e}'})
             # repo.close()
         except Exception as e:
             print(
                 f'Repo for team {team_name} cloned but unknown error when getting tag {default_branch}; should not happen. Stopping... {e}')
-            team_info.update({'git':'failed'})
+            team_info.update({'git_status':False})
             team_info.update({'comments':f'Repo for team {team_name} cloned but unknown error when getting tag {default_branch}; should not happen. Stopping... {e}'})
             # repo.close()  
     else:
-        team_info.update({'git':'succ'})
+        team_info.update({'git_status':True})
 
-    if team_info['git'] == 'succ':
+    if team_info['git_status']:
         try:
             if not os.path.exists(f"agents/{team_name}"):
                 shutil.copytree(f"{repo_path}/agents/{team_name}", f"agents/{team_name}")
@@ -151,7 +155,7 @@ def run(options,msg):
 
         team_info['url'] = agent_urls[i]
         team_info['commit_id'] = agent_commit_ids[i]
-        clone_info = gitCloneTeam(team_info, output_path="temp",default_branch=options.default_branch)
+        clone_info = gitCloneTeam(team_info, output_path="temp",default_branch=options.default_branch,token_path = options.token_path)
         team_info.update(clone_info)
         clone_result['teams'].update({i:team_info})
 
@@ -175,7 +179,8 @@ def loadParameter():
     parser = OptionParser(usageStr)
     parser.add_option('-a','--agents', help='A list of the agents, etc, agents.myteam.player', default="agents.TheLastSplendorBender.random,agents.gm-onyx.random") 
     parser.add_option('-n', '--num_of_agents', type='int',help='The number of agents in this game', default=2)
-    
+    parser.add_option('--token_path', help='the path to token', default="main") 
+        
     parser.add_option('--default_branch', help='the default branch name', default="main") 
     parser.add_option('--agent_names', help='A list of agent names', default="TheLastSplendorBender,gm-onyx") 
 
