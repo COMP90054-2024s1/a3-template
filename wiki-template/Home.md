@@ -2,15 +2,15 @@
 
 This Wiki can be used as external documentation to the project.
 1. [Home and Introduction]()
-2. [Problem Analysis](Problem-Analysis)
+2. [Problem Analysis](Problem-Analysis.md)
 
-    2.1 [Approach One](AI-Method-1)
+    2.1 [Approach One](AI-Method-1.md)
 
-    2.2 [Approach Two](AI-Method-2)
+    2.2 [Approach Two](AI-Method-2.md)
 
-    2.3 [Approach Three](AI-Method-3)
-3. [Experiment](Experiment)
-4. [Conclusions and Reflections](Conclusions-and-Reflections)
+    2.3 [Approach Three](AI-Method-3.md)
+3. [Experiment](Experiment.md)
+4. [Conclusions and Reflections](Conclusions-and-Reflections.md)
 
 
 
